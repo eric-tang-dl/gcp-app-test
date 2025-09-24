@@ -6,6 +6,7 @@ echo "=== 开始部署 ==="
 APP_NAME="myapp"
 APP_DIR="/opt/myapp"
 BACKUP_DIR="/opt/backups"
+VENV_DIR="/opt/myapp/venv" 
 
 # 1. 备份当前版本（如果存在）
 echo "备份当前版本..."
