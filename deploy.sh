@@ -32,7 +32,20 @@ sudo tar -xzf /tmp/app-package.tar.gz -C $APP_DIR
 # 5. 安装Python依赖
 echo "安装Python依赖..."
 cd $APP_DIR
-pip3 install -r requirements.txt
+
+# 删除旧的虚拟环境（如果存在）
+if [ -d "$VENV_DIR" ]; then
+    rm -rf $VENV_DIR
+fi
+
+# 创建新的虚拟环境
+python3 -m venv $VENV_DIR
+
+# 在虚拟环境中安装依赖
+source $VENV_DIR/bin/activate
+pip install -r requirements.txt
+deactivate
+
 
 # 6. 确保日志文件存在且有权限
 sudo touch /var/log/myapp/app.log
