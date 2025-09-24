@@ -1,0 +1,55 @@
+steps:
+  # 阶段 1: 安装依赖并打包
+  - name: 'python:3.11-slim'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "安装Flask..."
+        pip install flask
+
+        echo "运行一个简单的测试（检查导入是否正常）..."
+        python -c "import flask; print('Flask 导入成功！')"
+
+        echo "创建部署包..."
+        tar -czf /workspace/app-package.tar.gz app.py requirements.txt
+
+  # 阶段 2: 将包上传到Cloud Storage（用于存档和调试）
+  - name: 'gcr.io/cloud-builders/gsutil'
+    args: ['cp', '/workspace/app-package.tar.gz', 'gs:///app-build-.tar.gz']
+
+  # 阶段 2.5: 上传部署脚本到GCE实例
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "上传部署脚本到GCE实例: "
+        # 明确指定用户（通常是你在GCE实例上登录的用户名）
+        gcloud compute scp deploy.sh @:/tmp/deploy.sh --zone=
+        gcloud compute ssh @ --zone= --command="sudo cp /tmp/deploy.sh /home//deploy.sh && sudo chmod +x /home//deploy.sh"
+
+  # 阶段 3: 部署到GCE实例
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        set -e
+        echo "开始部署到实例: , 区域: "
+
+        echo "将部署包复制到GCE实例..."
+        gcloud compute scp /workspace/app-package.tar.gz @:/tmp/ --zone=
+
+        echo "在GCE实例上执行部署脚本..."
+        gcloud compute ssh @ --zone= --command="sudo /home//deploy.sh"
+
+# 替换变量
+substitutions:
+  _BUCKET_NAME: 'erictang'
+  _INSTANCE_NAME: 'instance-20250724-092511'
+  _ZONE: 'asia-east2-c'
+  _USER: 'eric'  # 添加这个变量，改成你在GCE实例上的用户名
+
+options:
+  logging: CLOUD_LOGGING_ONLY
