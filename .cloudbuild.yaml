@@ -16,7 +16,7 @@ steps:
 
   # 阶段 2: 将包上传到Cloud Storage（用于存档和调试）
   - name: 'gcr.io/cloud-builders/gsutil'
-    args: ['cp', '/workspace/app-package.tar.gz', 'gs:///app-build-.tar.gz']
+    args: ['cp', '/workspace/app-package.tar.gz', 'gs://${_BUCKET_NAME}/app-build-${BUILD_ID}.tar.gz']
 
   # 阶段 2.5: 上传部署脚本到GCE实例
   - name: 'gcr.io/cloud-builders/gcloud'
