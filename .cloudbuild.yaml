@@ -26,8 +26,8 @@ steps:
       - |
         echo "上传部署脚本到GCE实例: "
         # 明确指定用户（通常是你在GCE实例上登录的用户名）
-        gcloud compute scp deploy.sh @:/tmp/deploy.sh --zone=
-        gcloud compute ssh @ --zone= --command="sudo cp /tmp/deploy.sh /home//deploy.sh && sudo chmod +x /home//deploy.sh"
+        gcloud compute scp deploy.sh ${_USER}@${_INSTANCE_NAME}:/tmp/deploy.sh --zone=${_ZONE}
+        gcloud compute ssh ${_USER}@${_INSTANCE_NAME} --zone=${_ZONE} --command="sudo cp /tmp/deploy.sh /home/${_USER}/deploy.sh && sudo chmod +x /home/${_USER}/deploy.sh"
 
   # 阶段 3: 部署到GCE实例
   - name: 'gcr.io/cloud-builders/gcloud'
@@ -36,13 +36,13 @@ steps:
       - '-c'
       - |
         set -e
-        echo "开始部署到实例: , 区域: "
+        echo "开始部署到实例: ${_INSTANCE_NAME}, 区域: ${_ZONE}"
 
         echo "将部署包复制到GCE实例..."
-        gcloud compute scp /workspace/app-package.tar.gz @:/tmp/ --zone=
+        gcloud compute scp /workspace/app-package.tar.gz ${_USER}@${_INSTANCE_NAME}:/tmp/ --zone=${_ZONE}
 
         echo "在GCE实例上执行部署脚本..."
-        gcloud compute ssh @ --zone= --command="sudo /home//deploy.sh"
+        gcloud compute ssh ${_USER}@${_INSTANCE_NAME} --zone=${_ZONE} --command="sudo /home/${_USER}/deploy.sh"
 
 # 替换变量
 substitutions:
