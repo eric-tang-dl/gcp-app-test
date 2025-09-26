@@ -14,10 +14,10 @@ on:
 permissions:
   contents: read
 
-# jobs:
-#   build:
+jobs:
+  build:
 
-    # runs-on: ubuntu-latest
+   runs-on: ubuntu-latest
 
     # steps:
     # - uses: actions/checkout@v4
